@@ -1,0 +1,14 @@
+{
+    "manifest_version" : 2,
+    "name" : "I Am Present",
+    "description" : "in online classes, it will mimic the crowd's actions and fakes you as a present student !",
+    "version" : "1.0.0" , 
+    "icons" : {"128" : "icon-off-128.png"} ,
+    "browser_action" : {
+        "default_icon" : "icon-off.png" ,
+        "default_popup" : "popup.html"
+    },
+    "permissions" : ["activeTab", "storage", "decarativeContent"],
+    "content_scripts" : ["<all_urls>"] ,
+    "js" : ["content.js"]
+}
