@@ -8,7 +8,12 @@
         "default_icon" : "icon-off.png" ,
         "default_popup" : "popup.html"
     },
-    "permissions" : ["activeTab", "storage", "decarativeContent"],
-    "content_scripts" : ["<all_urls>"] ,
-    "js" : ["content.js"]
+    "permissions" : ["activeTab", "storage", "declarativeContent"],
+    "content_scripts" : [
+        {
+            "matches" : ["http://*.daan.ir/*"],
+            "js" : ["content.js"]
+        }
+    ]
+    
 }
