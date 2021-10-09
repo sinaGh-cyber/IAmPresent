@@ -11,9 +11,8 @@
   "permissions": ["activeTab", "storage", "declarativeContent"],
   "content_scripts": [
     {
-      "matches": ["http://*.daan.ir/*"],
+      "matches": ["https://*.daan.ir/*"],
       "js": ["content.js"]
     }
   ]
-
 }
