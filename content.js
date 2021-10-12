@@ -14,6 +14,11 @@ const getTime = () => {
   );
 };
 
+const getPresentUserNum = (rawString = userCunte) => {
+  const digit = /\b\d{1,3}\b/;
+  return rawString.match(digit)[0];
+};
+
 const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
   return hour * 3600 + minute * 60 + second + miliSecond / 1000;
 };
@@ -51,9 +56,6 @@ setTimeout(function () {
   console.log(messages);
   console.log(userCunte);
 
-  // setTimeout(() => {
-  //   console.log(messages);
-  // }, 15000);
 
   chrome.runtime.onMessage.addListener(processMessagHandler);
 }, 20000);
