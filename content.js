@@ -26,8 +26,6 @@ const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
 
 const mimicer = () => {
   console.log('mimicing...');
-
-
 };
 
 const mimicerStop = () => {
@@ -43,10 +41,12 @@ const processMessagHandler = (messages, sender, sendResponse) => {
 };
 
 const setInintialCunter = () => {
- const presentNum = getPresentUserNum(userCunte);
-if (messages.length > presentNum) {
-  cunter = messages.length - presentNum -1;
-}
+  const presentNum = getPresentUserNum(userCunte);
+  if (messages.length > presentNum) {
+    cunter = messages.length - presentNum - 1;
+  } else {
+    cunter = 0;
+  }
 };
 
 setTimeout(function () {
