@@ -3,6 +3,7 @@ console.log('I Am Presnt is running...');
 const MIMIC = 'mimicBtn';
 const ON = 'bg-green';
 const OFF = 'bg-red';
+let cunter;
 
 const getTime = () => {
   let date = new Date();
@@ -14,9 +15,9 @@ const getTime = () => {
   );
 };
 
-const getPresentUserNum = (rawString = userCunte) => {
+const getPresentUserNum = (rawString) => {
   const digit = /\b\d{1,3}\b/;
-  return rawString.match(digit)[0];
+  return rawString.innerText.match(digit)[0].parseInt();
 };
 
 const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
@@ -25,7 +26,8 @@ const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
 
 const mimicer = () => {
   console.log('mimicing...');
-  // sendBtn.click();
+
+
 };
 
 const mimicerStop = () => {
@@ -40,22 +42,33 @@ const processMessagHandler = (messages, sender, sendResponse) => {
   }
 };
 
+const setInintialCunter = () => {
+ const presentNum = getPresentUserNum(userCunte);
+if (messages.length > presentNum) {
+  cunter = messages.length - presentNum -1;
+}
+};
+
 setTimeout(function () {
   console.log('timeout running');
 
   const messages = document
     .getElementById('chat-messages')
     .getElementsByTagName('p');
-
   const textInput = document.getElementById('message-input');
   const sendBtn = document.querySelector('form button');
   const userCunte = document.getElementsByTagName('h2')[2];
 
   console.log(sendBtn);
   console.log(textInput);
-  console.log(messages);
-  console.log(userCunte);
+  console.log(userCunte.innerText);
 
+  setInintialCunter();
+
+  setInterval(() => {
+    console.log(getPresentUserNum(userCunte));
+    console.log(messages);
+  }, 5000);
 
   chrome.runtime.onMessage.addListener(processMessagHandler);
 }, 20000);
