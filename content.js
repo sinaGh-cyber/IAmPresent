@@ -4,7 +4,35 @@ const MIMIC = 'mimicBtn';
 const ON = 'bg-green';
 const OFF = 'bg-red';
 let cunter;
+let MESSAGES;
+const digestedDataArry = [];
 
+const dataDigestor = () => {
+  console.dir('*********');
+  console.dir(MESSAGES);
+  console.dir('*********');
+  for (let i = cunter; i < MESSAGES.length ; i++) {
+    console.dir('*********');
+    console.dir(MESSAGES[i], i);
+    console.dir(i);
+    console.dir('*********');
+
+    const dataObj = {
+      creationTime: getTime(),
+      consumed: false,
+      expired: false,
+      text: MESSAGES[i].innerHTML,
+    };
+    
+    digestedDataArry.push(dataObj);
+  }
+  cunter = MESSAGES.length;
+};
+
+const mimicIntervalHandler = () => {
+  dataDigestor();
+  console.log(digestedDataArry);
+};
 const getTime = () => {
   let date = new Date();
   return (
@@ -17,7 +45,7 @@ const getTime = () => {
 
 const getPresentUserNum = (rawString) => {
   const digit = /\b\d{1,3}\b/;
-  return rawString.innerText.match(digit)[0].parseInt();
+  return +rawString.innerText.match(digit)[0];
 };
 
 const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
@@ -26,26 +54,27 @@ const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
 
 const mimicer = () => {
   console.log('mimicing...');
+  setInterval(mimicIntervalHandler, 1000);
 };
 
 const mimicerStop = () => {
   console.log('mimic stop !');
 };
 
-const processMessagHandler = (messages, sender, sendResponse) => {
-  for (message in messages) {
-    if (message === MIMIC && messages[message].includes(ON)) mimicer();
-    else if (message === MIMIC && messages[message].includes(OFF))
+const processMessagHandler = (masseages) => {
+  for (message in masseages) {
+    if (message === MIMIC && masseages[message].includes(ON)) mimicer();
+    else if (message === MIMIC && masseages[message].includes(OFF))
       mimicerStop();
   }
 };
 
-const setInintialCunter = () => {
+const setInintialCunter = (userCunte, messages) => {
   const presentNum = getPresentUserNum(userCunte);
   if (messages.length > presentNum) {
     cunter = messages.length - presentNum - 1;
   } else {
-    cunter = 0;
+    cunter = messages.length;
   }
 };
 
@@ -59,16 +88,14 @@ setTimeout(function () {
   const sendBtn = document.querySelector('form button');
   const userCunte = document.getElementsByTagName('h2')[2];
 
+  MESSAGES = messages;
+
   console.log(sendBtn);
   console.log(textInput);
   console.log(userCunte.innerText);
 
-  setInintialCunter();
+  setInintialCunter(userCunte, messages);
 
-  setInterval(() => {
-    console.log(getPresentUserNum(userCunte));
-    console.log(messages);
-  }, 5000);
 
   chrome.runtime.onMessage.addListener(processMessagHandler);
 }, 20000);
