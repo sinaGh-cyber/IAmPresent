@@ -5,34 +5,71 @@ const ON = 'bg-green';
 const OFF = 'bg-red';
 let cunter;
 let MESSAGES;
-const digestedDataArry = [];
+let USERCUNTE;
+const colectedData = [];
+let lastExpiredObj = 0;
 
-const dataDigestor = () => {
+const dataColector = () => {
   console.dir('*********');
   console.dir(MESSAGES);
   console.dir('*********');
-  for (let i = cunter; i < MESSAGES.length ; i++) {
+  for (let i = cunter; i < MESSAGES.length; i++) {
     console.dir('*********');
-    console.dir(MESSAGES[i], i);
+    console.dir(MESSAGES[i]);
     console.dir(i);
     console.dir('*********');
 
     const dataObj = {
       creationTime: getTime(),
-      consumed: false,
-      expired: false,
       text: MESSAGES[i].innerHTML,
     };
-    
-    digestedDataArry.push(dataObj);
+
+    colectedData.push(dataObj);
   }
   cunter = MESSAGES.length;
 };
 
-const mimicIntervalHandler = () => {
-  dataDigestor();
-  console.log(digestedDataArry);
+const checkGeneralSimilarity = (lastEpierdObj) => {
+  const textCunts = {};
+  for (let i = lastEpierdObj; i < colectedData.length - 1; i++) {
+    let expirDate = getTime() - setTime(0, 2);
+
+    if (colectedData[i].creationTime < expirDate) lastExpiredObj = i;
+
+    textCunts[colectedData[i].text].text = textCunts[colectedData[i].text].text;
+    textCunts[colectedData[i].text].itration = (textCunts[colectedData[i].text].itration || 0) + 1 ;
+    textCunts[colectedData[i].text].idx = i;
+  }
+
+  for(let obj in textCunts) {
+    if (obj.itration > getPresentUserNum(USERCUNTE) * 0.6) {
+      console.log(obj.text);
+      lastExpiredObj = obj.idx;
+  }
+}
 };
+
+const dataDigestor = () => {
+  checkGeneralSimilarity();
+  // checkNumberSimilarity();
+  // checkPositivSimilarity();
+  // checkNegativSimilarity();
+  // checkIMTierdSimilarity();
+  // checkHelloSimilarity();
+};
+
+const mimicIntervalHandler = () => {
+  dataColector();
+  dataDigestor();
+
+  console.log(colectedData);
+};
+
+const getPresentUserNum = (rawString) => {
+  const digit = /\b\d{1,3}\b/;
+  return +rawString.innerText.match(digit)[0];
+};
+
 const getTime = () => {
   let date = new Date();
   return (
@@ -43,22 +80,18 @@ const getTime = () => {
   );
 };
 
-const getPresentUserNum = (rawString) => {
-  const digit = /\b\d{1,3}\b/;
-  return +rawString.innerText.match(digit)[0];
-};
-
 const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
   return hour * 3600 + minute * 60 + second + miliSecond / 1000;
 };
 
 const mimicer = () => {
   console.log('mimicing...');
-  setInterval(mimicIntervalHandler, 1000);
+  setInterval(mimicIntervalHandler, 3000);
 };
 
 const mimicerStop = () => {
   console.log('mimic stop !');
+  clearInterval(mimicIntervalHandler);
 };
 
 const processMessagHandler = (masseages) => {
@@ -89,13 +122,13 @@ setTimeout(function () {
   const userCunte = document.getElementsByTagName('h2')[2];
 
   MESSAGES = messages;
+  USERCUNTE = userCunte;
 
   console.log(sendBtn);
   console.log(textInput);
   console.log(userCunte.innerText);
 
   setInintialCunter(userCunte, messages);
-
 
   chrome.runtime.onMessage.addListener(processMessagHandler);
 }, 20000);
