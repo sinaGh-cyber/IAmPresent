@@ -21,7 +21,7 @@ const sendCurentStatus = (Btn, tabs) => {
   const msg = {};
   msg[Btn.id] = Btn.className;
   console.log(msg);
-  
+
   chrome.tabs.sendMessage(tabs[0].id, msg);
 };
 
@@ -34,5 +34,5 @@ const mimicBtnHandler = () => {
   toggleBtn(mimicBtn);
   runContentJs(mimicBtn);
 };
-
+// chrome.tabs.sendMessage(tabs[0].id, msg);
 mimicBtn.addEventListener('click', mimicBtnHandler);

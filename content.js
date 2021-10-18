@@ -6,19 +6,18 @@ const OFF = 'bg-red';
 let cunter;
 let MESSAGES;
 let USERCUNTE;
+const PARTICIPATION_RATE = 0.25;
+let mimicIntervalID;
 const colectedData = [];
 let lastExpiredObj = 0;
+
+const sendStatusToPopup = () => {};
 
 const dataColector = () => {
   console.dir('*********');
   console.dir(MESSAGES);
   console.dir('*********');
   for (let i = cunter; i < MESSAGES.length; i++) {
-    console.dir('*********');
-    console.dir(MESSAGES[i]);
-    console.dir(i);
-    console.dir('*********');
-
     const dataObj = {
       creationTime: getTime(),
       text: MESSAGES[i].innerHTML,
@@ -30,23 +29,47 @@ const dataColector = () => {
 };
 
 const checkGeneralSimilarity = (lastEpierdObj) => {
+  console.log('I m running: checkGeneralSimilarity ');
   const textCunts = {};
-  for (let i = lastEpierdObj; i < colectedData.length - 1; i++) {
+  for (let i = lastExpiredObj; i < colectedData.length; i++) {
+    console.log('I m running: checkGeneralSimilarity > loop');
     let expirDate = getTime() - setTime(0, 2);
 
     if (colectedData[i].creationTime < expirDate) lastExpiredObj = i;
-
-    textCunts[colectedData[i].text].text = textCunts[colectedData[i].text].text;
-    textCunts[colectedData[i].text].itration = (textCunts[colectedData[i].text].itration || 0) + 1 ;
+    textCunts[colectedData[i].text] = textCunts[colectedData[i].text] || {};
+    textCunts[colectedData[i].text].text = colectedData[i].text;
+    textCunts[colectedData[i].text].itration =
+      (textCunts[colectedData[i].text].itration || 0) + 1;
     textCunts[colectedData[i].text].idx = i;
   }
 
-  for(let obj in textCunts) {
-    if (obj.itration > getPresentUserNum(USERCUNTE) * 0.6) {
-      console.log(obj.text);
-      lastExpiredObj = obj.idx;
+  console.log('##############');
+  console.log('textCunts:');
+  console.log(textCunts);
+  console.log('##############');
+
+  for (let obj in textCunts) {
+    if (
+      textCunts[obj].itration >
+      getPresentUserNum(USERCUNTE) * PARTICIPATION_RATE
+    ) {
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@');
+      console.log('^^^^^^^^^^^^^^^^^^^');
+      console.log(textCunts[obj].text);
+      console.log('^^^^^^^^^^^^^^^^^^^');
+      console.log('@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      
+      lastExpiredObj = textCunts[obj].idx;
+    }
   }
-}
 };
 
 const dataDigestor = () => {
@@ -86,12 +109,13 @@ const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
 
 const mimicer = () => {
   console.log('mimicing...');
-  setInterval(mimicIntervalHandler, 3000);
+  mimicIntervalID = setInterval(mimicIntervalHandler, 3000);
+  sendStatusToPopup(MIMIC, ON);
 };
 
 const mimicerStop = () => {
   console.log('mimic stop !');
-  clearInterval(mimicIntervalHandler);
+  clearInterval(mimicIntervalID);
 };
 
 const processMessagHandler = (masseages) => {
@@ -102,33 +126,28 @@ const processMessagHandler = (masseages) => {
   }
 };
 
-const setInintialCunter = (userCunte, messages) => {
-  const presentNum = getPresentUserNum(userCunte);
-  if (messages.length > presentNum) {
-    cunter = messages.length - presentNum - 1;
+const setInintialCunter = () => {
+  const presentNum = getPresentUserNum(USERCUNTE);
+  if (MESSAGES.length > presentNum) {
+    cunter = MESSAGES.length - presentNum - 1;
   } else {
-    cunter = messages.length;
+    cunter = 0;
   }
 };
 
 setTimeout(function () {
   console.log('timeout running');
 
-  const messages = document
-    .getElementById('chat-messages')
-    .getElementsByTagName('p');
+  MESSAGES = document.getElementById('chat-messages').getElementsByTagName('p');
   const textInput = document.getElementById('message-input');
   const sendBtn = document.querySelector('form button');
-  const userCunte = document.getElementsByTagName('h2')[2];
-
-  MESSAGES = messages;
-  USERCUNTE = userCunte;
+  USERCUNTE = document.getElementsByTagName('h2')[2];
 
   console.log(sendBtn);
   console.log(textInput);
-  console.log(userCunte.innerText);
+  console.log(USERCUNTE.innerText);
 
-  setInintialCunter(userCunte, messages);
+  setInintialCunter();
 
   chrome.runtime.onMessage.addListener(processMessagHandler);
 }, 20000);
