@@ -3,20 +3,35 @@ console.log('I Am Presnt is running...');
 const MIMIC = 'mimicBtn';
 const ON = 'bg-green';
 const OFF = 'bg-red';
+const query = 'query';
+let STATUS = 'none';
+let sendBtn;
+let textInput;
+const StatusRequstMsg = 'giv me your status...';
 let cunter;
 let MESSAGES;
 let USERCUNTE;
-const PARTICIPATION_RATE = 0.25;
+const PARTICIPATION_RATE = 0.31;
 let mimicIntervalID;
 const colectedData = [];
 let lastExpiredObj = 0;
 
-const sendStatusToPopup = () => {};
+const sendChatMSg = (msg) => {
+  textInput.value = msg;
+  sendBtn.click();
+  console.log('~~~~~~~~~~~~~~~~~~');
+};
+
+const sendCurentStatusToPopup = () => {
+  chrome.runtime.sendMessage({
+    data: STATUS,
+  });
+};
 
 const dataColector = () => {
-  console.dir('*********');
-  console.dir(MESSAGES);
-  console.dir('*********');
+  // console.dir('*********');
+  // console.dir(MESSAGES);
+  // console.dir('*********');
   for (let i = cunter; i < MESSAGES.length; i++) {
     const dataObj = {
       creationTime: getTime(),
@@ -28,11 +43,9 @@ const dataColector = () => {
   cunter = MESSAGES.length;
 };
 
-const checkGeneralSimilarity = (lastEpierdObj) => {
-  console.log('I m running: checkGeneralSimilarity ');
+const checkGeneralSimilarity = () => {
   const textCunts = {};
   for (let i = lastExpiredObj; i < colectedData.length; i++) {
-    console.log('I m running: checkGeneralSimilarity > loop');
     let expirDate = getTime() - setTime(0, 2);
 
     if (colectedData[i].creationTime < expirDate) lastExpiredObj = i;
@@ -43,10 +56,10 @@ const checkGeneralSimilarity = (lastEpierdObj) => {
     textCunts[colectedData[i].text].idx = i;
   }
 
-  console.log('##############');
-  console.log('textCunts:');
-  console.log(textCunts);
-  console.log('##############');
+  // console.log('##############');
+  // console.log('textCunts:');
+  // console.log(textCunts);
+  // console.log('##############');
 
   for (let obj in textCunts) {
     if (
@@ -66,14 +79,16 @@ const checkGeneralSimilarity = (lastEpierdObj) => {
       console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
       console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
       console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      
+
       lastExpiredObj = textCunts[obj].idx;
+      sendChatMSg(textCunts[obj].text);
     }
   }
 };
 
 const dataDigestor = () => {
   checkGeneralSimilarity();
+
   // checkNumberSimilarity();
   // checkPositivSimilarity();
   // checkNegativSimilarity();
@@ -85,7 +100,7 @@ const mimicIntervalHandler = () => {
   dataColector();
   dataDigestor();
 
-  console.log(colectedData);
+  // console.log(colectedData);
 };
 
 const getPresentUserNum = (rawString) => {
@@ -109,12 +124,13 @@ const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
 
 const mimicer = () => {
   console.log('mimicing...');
+  STATUS = 'mimicing...';
   mimicIntervalID = setInterval(mimicIntervalHandler, 3000);
-  sendStatusToPopup(MIMIC, ON);
 };
 
 const mimicerStop = () => {
   console.log('mimic stop !');
+  STATUS = 'mimic stop !';
   clearInterval(mimicIntervalID);
 };
 
@@ -123,6 +139,9 @@ const processMessagHandler = (masseages) => {
     if (message === MIMIC && masseages[message].includes(ON)) mimicer();
     else if (message === MIMIC && masseages[message].includes(OFF))
       mimicerStop();
+    else if (message === query && masseages[message] === StatusRequstMsg) {
+      sendCurentStatusToPopup();
+    }
   }
 };
 
@@ -136,17 +155,15 @@ const setInintialCunter = () => {
 };
 
 setTimeout(function () {
-  console.log('timeout running');
-
   MESSAGES = document.getElementById('chat-messages').getElementsByTagName('p');
-  const textInput = document.getElementById('message-input');
-  const sendBtn = document.querySelector('form button');
+  textInput = document.getElementById('message-input');
+  sendBtn = document.querySelector('form button span');
   USERCUNTE = document.getElementsByTagName('h2')[2];
 
   console.log(sendBtn);
   console.log(textInput);
   console.log(USERCUNTE.innerText);
-
+  console.log('ready to use!');
   setInintialCunter();
 
   chrome.runtime.onMessage.addListener(processMessagHandler);

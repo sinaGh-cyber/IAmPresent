@@ -1,8 +1,53 @@
 const mimicBtn = document.getElementById('mimicBtn');
+const NONE = 'none';
+const MIMIC_BTN_ON = 'mimicing...';
+const MIMIC_BTN_OFF = 'mimic stop !';
 
 const configObj = {
   active: true,
   currentWindow: true,
+};
+const processMessagHandler = (masseages) => {
+  for (message in masseages) {
+    console.log('processMessagHandler is runing...');
+    console.log('££££££££££££££££££££££££££££');
+    console.log('££££££££££££££££££££££££££££');
+    console.log('££££££££££££££££££££££££££££');
+    console.log('££££££££££££££££££££££££££££');
+    console.log(masseages[message]);
+    console.log('££££££££££££££££££££££££££££');
+    console.log('££££££££££££££££££££££££££££');
+    console.log('££££££££££££££££££££££££££££');
+    console.log('££££££££££££££££££££££££££££');
+    if (masseages[message] === NONE) return;
+    else if (masseages[message] === MIMIC_BTN_ON) {
+      if (mimicBtn.classList.contains('bg-red')) {
+        mimicBtn.classList.replace('bg-red', 'bg-green');
+        mimicBtn
+          .querySelector('i')
+          .classList.replace('fa-toggle-off', 'fa-toggle-on');
+      }
+    } else if (masseages[message] === MIMIC_BTN_OFF) {
+      mimicBtn.classList.replace('bg-green', 'bg-red');
+      mimicBtn
+        .querySelector('i')
+        .classList.replace('fa-toggle-on', 'fa-toggle-off');
+    }
+  }
+};
+const sendStatuusRequst = (tabs) => {
+  console.log('££££££££££££££££££££££££££££');
+  console.log('££££££££££££££££££££££££££££');
+  console.log('££££££££££££££££££££££££££££');
+  console.log('££££££££££££££££££££££££££££');
+  console.log('sendStatuusRequst is runing...');
+  console.log('££££££££££££££££££££££££££££');
+  console.log('££££££££££££££££££££££££££££');
+  console.log('££££££££££££££££££££££££££££');
+  console.log('££££££££££££££££££££££££££££');
+  const msg = {};
+  msg.query = 'giv me your status...';
+  chrome.tabs.sendMessage(tabs[0].id, msg);
 };
 // console.log(mimicBtn);
 const toggleBtn = (Btn) => {
@@ -34,5 +79,6 @@ const mimicBtnHandler = () => {
   toggleBtn(mimicBtn);
   runContentJs(mimicBtn);
 };
-// chrome.tabs.sendMessage(tabs[0].id, msg);
+chrome.tabs.query(configObj, sendStatuusRequst);
 mimicBtn.addEventListener('click', mimicBtnHandler);
+chrome.runtime.onMessage.addListener(processMessagHandler);
