@@ -16,10 +16,33 @@ let mimicIntervalID;
 const colectedData = [];
 let lastExpiredObj = 0;
 
+const getPresentUserNum = (rawString) => {
+  const digit = /\b\d{1,3}\b/;
+  return +rawString.innerText.match(digit)[0];
+};
+
 const sendChatMSg = (msg) => {
+  // const evtUp = new KeyboardEvent('keyup');
+  // const evtDown = new KeyboardEvent('keydown');
+
+  // textInput.focus();
   textInput.value = msg;
-  sendBtn.click();
-  console.log('~~~~~~~~~~~~~~~~~~');
+  textInput.innerHTML = msg;
+  // textInput.focus();
+
+  // textInput.dispatchEvent(evtUp);
+  // textInput.dispatchEvent(evtDown);
+
+  console.log(sendBtn);
+
+  setTimeout(() => {
+    console.log('~~~~~~~~~~~~~~~~~~');
+    console.log(sendBtn);
+    sendBtn.disabled = false;
+    sendBtn.querySelector('span').click();
+    console.log(sendBtn);
+    console.log('~~~~~~~~~~~~~~~~~~');
+  }, 5000);
 };
 
 const sendCurentStatusToPopup = () => {
@@ -43,12 +66,13 @@ const dataColector = () => {
   cunter = MESSAGES.length;
 };
 
-const checkGeneralSimilarity = () => {
+const generalScenarioCheck = () => {
   const textCunts = {};
   for (let i = lastExpiredObj; i < colectedData.length; i++) {
     let expirDate = getTime() - setTime(0, 2);
 
     if (colectedData[i].creationTime < expirDate) lastExpiredObj = i;
+
     textCunts[colectedData[i].text] = textCunts[colectedData[i].text] || {};
     textCunts[colectedData[i].text].text = colectedData[i].text;
     textCunts[colectedData[i].text].itration =
@@ -61,39 +85,72 @@ const checkGeneralSimilarity = () => {
   // console.log(textCunts);
   // console.log('##############');
 
-  for (let obj in textCunts) {
+  for (let textObj in textCunts) {
     if (
-      textCunts[obj].itration >
+      textCunts[textObj].itration >
       getPresentUserNum(USERCUNTE) * PARTICIPATION_RATE
     ) {
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@');
-      console.log('^^^^^^^^^^^^^^^^^^^');
-      console.log(textCunts[obj].text);
-      console.log('^^^^^^^^^^^^^^^^^^^');
-      console.log('@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@');
+      // console.log('^^^^^^^^^^^^^^^^^^^');
+      // console.log(textCunts[textObj].text);
+      // console.log('^^^^^^^^^^^^^^^^^^^');
+      // console.log('@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
 
-      lastExpiredObj = textCunts[obj].idx;
-      sendChatMSg(textCunts[obj].text);
+      lastExpiredObj = textCunts[textObj].idx;
+      sendChatMSg(textCunts[textObj].text);
+    }
+  }
+};
+
+const caseScenarioCheck = (scenarioArr, callBackFunc) => {
+  let counter = 0;
+  for (let i = lastExpiredObj; i < colectedData.length; i++) {
+    let expirDate = getTime() - setTime(0, 2);
+
+    if (colectedData[i].creationTime < expirDate) {
+      lastExpiredObj = i;
+      continue;
+    }
+
+    for (let Case of scenarioArr) {
+      if (Case === colectedData[i].text) {
+        counter++;
+        if (counter > getPresentUserNum(USERCUNTE) * PARTICIPATION_RATE) {
+          console.log(
+            '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+          );
+          console.log(Math.floor(Math.random() * (scenarioArr.length - 1)));
+          console.log(
+            scenarioArr[Math.floor(Math.random() * (scenarioArr.length - 1))]
+          );
+          console.log(
+            '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+          );
+
+          lastExpiredObj = i;
+          sendChatMSg(
+            scenarioArr[Math.floor(Math.random() * (scenarioArr.length - 1))]
+          );
+
+          if (callBackFunc) callBackFunc();
+        }
+      }
     }
   }
 };
 
 const dataDigestor = () => {
-  checkGeneralSimilarity();
+  generalScenarioCheck();
 
-  // checkNumberSimilarity();
-  // checkPositivSimilarity();
-  // checkNegativSimilarity();
-  // checkIMTierdSimilarity();
-  // checkHelloSimilarity();
+  // caseScenarioCheck();
 };
 
 const mimicIntervalHandler = () => {
@@ -101,11 +158,6 @@ const mimicIntervalHandler = () => {
   dataDigestor();
 
   // console.log(colectedData);
-};
-
-const getPresentUserNum = (rawString) => {
-  const digit = /\b\d{1,3}\b/;
-  return +rawString.innerText.match(digit)[0];
 };
 
 const getTime = () => {
@@ -157,13 +209,13 @@ const setInintialCunter = () => {
 setTimeout(function () {
   MESSAGES = document.getElementById('chat-messages').getElementsByTagName('p');
   textInput = document.getElementById('message-input');
-  sendBtn = document.querySelector('form button span');
+  sendBtn = document.querySelector('form button');
   USERCUNTE = document.getElementsByTagName('h2')[2];
 
-  console.log(sendBtn);
-  console.log(textInput);
-  console.log(USERCUNTE.innerText);
-  console.log('ready to use!');
+  // console.log(sendBtn);
+  // console.log(textInput);
+  // console.log(USERCUNTE.innerText);
+  console.log('ready to use:');
   setInintialCunter();
 
   chrome.runtime.onMessage.addListener(processMessagHandler);
