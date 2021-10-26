@@ -11,7 +11,7 @@ const StatusRequstMsg = 'giv me your status...';
 let cunter;
 let MESSAGES;
 let USERCUNTE;
-const PARTICIPATION_RATE = 0.31;
+const PARTICIPATION_RATE = 0.21;
 let mimicIntervalID;
 const colectedData = [];
 let lastExpiredObj = 0;
@@ -22,25 +22,37 @@ const getPresentUserNum = (rawString) => {
 };
 
 const sendChatMSg = (msg) => {
-  // const evtUp = new KeyboardEvent('keyup');
-  // const evtDown = new KeyboardEvent('keydown');
+  const evtUp = new KeyboardEvent('keydown', {
+    code: 'Space',
+    charCode: 0,
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    keyCode: 32,
+    isTrusted: true,
+    key: ' ',
+  });
 
-  // textInput.focus();
+  console.dir(evtUp);
+  textInput.focus();
+  console.dir(textInput);
   textInput.value = msg;
   textInput.innerHTML = msg;
-  // textInput.focus();
+  console.dir(textInput);
+  textInput.focus();
+  textInput.click();
 
-  // textInput.dispatchEvent(evtUp);
-  // textInput.dispatchEvent(evtDown);
+  textInput.dispatchEvent(evtUp);
 
   console.log(sendBtn);
 
   setTimeout(() => {
     console.log('~~~~~~~~~~~~~~~~~~');
-    console.log(sendBtn);
+    console.dir(sendBtn);
     sendBtn.disabled = false;
-    sendBtn.querySelector('span').click();
-    console.log(sendBtn);
+    textInput.dispatchEvent(evtUp);
+    sendBtn.click();
+    console.dir(sendBtn);
     console.log('~~~~~~~~~~~~~~~~~~');
   }, 5000);
 };
@@ -65,7 +77,7 @@ const dataColector = () => {
   }
   cunter = MESSAGES.length;
 };
-
+// check for itration of a exatly the same message
 const generalScenarioCheck = () => {
   const textCunts = {};
   for (let i = lastExpiredObj; i < colectedData.length; i++) {
@@ -110,6 +122,7 @@ const generalScenarioCheck = () => {
   }
 };
 
+//get 2 arguments, first an arry of same category and secand a callback func to be run if chck scenario matched
 const caseScenarioCheck = (scenarioArr, callBackFunc) => {
   let counter = 0;
   for (let i = lastExpiredObj; i < colectedData.length; i++) {
@@ -146,7 +159,7 @@ const caseScenarioCheck = (scenarioArr, callBackFunc) => {
     }
   }
 };
-
+//put all data that collected in chck for varios check scenario:
 const dataDigestor = () => {
   generalScenarioCheck();
 
@@ -159,7 +172,7 @@ const mimicIntervalHandler = () => {
 
   // console.log(colectedData);
 };
-
+// return todays  elapsed seconds since 00:00
 const getTime = () => {
   let date = new Date();
   return (
@@ -169,23 +182,24 @@ const getTime = () => {
     date.getMilliseconds() / 1000
   );
 };
-
+// get nuber of hour, minuts, second and miliSeconds as argument and return equal secondes for arguments
 const setTime = (hour = 0, minute = 0, second = 0, miliSecond = 0) => {
   return hour * 3600 + minute * 60 + second + miliSecond / 1000;
 };
 
+// mimic crowds actions:
 const mimicer = () => {
   console.log('mimicing...');
   STATUS = 'mimicing...';
   mimicIntervalID = setInterval(mimicIntervalHandler, 3000);
 };
-
+// clear mimicers interval and stops mimicer:
 const mimicerStop = () => {
   console.log('mimic stop !');
   STATUS = 'mimic stop !';
   clearInterval(mimicIntervalID);
 };
-
+// process incoming messages from popup.js:
 const processMessagHandler = (masseages) => {
   for (message in masseages) {
     if (message === MIMIC && masseages[message].includes(ON)) mimicer();
@@ -197,6 +211,8 @@ const processMessagHandler = (masseages) => {
   }
 };
 
+// This func in the fist excution of code will determine value of cunter,
+// cunter going to be used at dataColector func
 const setInintialCunter = () => {
   const presentNum = getPresentUserNum(USERCUNTE);
   if (MESSAGES.length > presentNum) {
@@ -206,17 +222,32 @@ const setInintialCunter = () => {
   }
 };
 
-setTimeout(function () {
-  MESSAGES = document.getElementById('chat-messages').getElementsByTagName('p');
+// This interVal mackes sure that page is fully loaded:
+let InterValID = setInterval(() => {
+  if (document.getElementById('chat-messages')) {
+    MESSAGES = document
+      .getElementById('chat-messages')
+      .getElementsByTagName('p');
+  }
+
   textInput = document.getElementById('message-input');
   sendBtn = document.querySelector('form button');
   USERCUNTE = document.getElementsByTagName('h2')[2];
 
-  // console.log(sendBtn);
-  // console.log(textInput);
-  // console.log(USERCUNTE.innerText);
-  console.log('ready to use:');
-  setInintialCunter();
+  if (MESSAGES && textInput && sendBtn && USERCUNTE) {
+    clearInterval(InterValID);
 
-  chrome.runtime.onMessage.addListener(processMessagHandler);
-}, 20000);
+    console.log(sendBtn);
+    console.log(textInput);
+    console.log(USERCUNTE.innerText);
+    console.log('ready to use:');
+
+    setInintialCunter();
+    chrome.runtime.onMessage.addListener(processMessagHandler);
+
+    setTimeout(() => {
+      sendChatMSg('.');
+      console.dir(textInput);
+    }, 20000);
+  }
+}, 1000);

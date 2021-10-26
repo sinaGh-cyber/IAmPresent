@@ -9,16 +9,6 @@ const configObj = {
 };
 const processMessagHandler = (masseages) => {
   for (message in masseages) {
-    console.log('processMessagHandler is runing...');
-    console.log('££££££££££££££££££££££££££££');
-    console.log('££££££££££££££££££££££££££££');
-    console.log('££££££££££££££££££££££££££££');
-    console.log('££££££££££££££££££££££££££££');
-    console.log(masseages[message]);
-    console.log('££££££££££££££££££££££££££££');
-    console.log('££££££££££££££££££££££££££££');
-    console.log('££££££££££££££££££££££££££££');
-    console.log('££££££££££££££££££££££££££££');
     if (masseages[message] === NONE) return;
     else if (masseages[message] === MIMIC_BTN_ON) {
       if (mimicBtn.classList.contains('bg-red')) {
@@ -36,15 +26,7 @@ const processMessagHandler = (masseages) => {
   }
 };
 const sendStatuusRequst = (tabs) => {
-  console.log('££££££££££££££££££££££££££££');
-  console.log('££££££££££££££££££££££££££££');
-  console.log('££££££££££££££££££££££££££££');
-  console.log('££££££££££££££££££££££££££££');
-  console.log('sendStatuusRequst is runing...');
-  console.log('££££££££££££££££££££££££££££');
-  console.log('££££££££££££££££££££££££££££');
-  console.log('££££££££££££££££££££££££££££');
-  console.log('££££££££££££££££££££££££££££');
+
   const msg = {};
   msg.query = 'giv me your status...';
   chrome.tabs.sendMessage(tabs[0].id, msg);
